@@ -29,8 +29,12 @@ public:
 	typedef boost::function<void()> EventCallback;
 	Channel(EventLoop* loop, int fd);
 //	~Channel();
-	void enableReading(){ioWatcher_.set(fd_, ev::READ);};
-	void enableWriting(){ioWatcher_.set(fd_, ev::WRITE);};
+	void enableReading(){ioWatcher_.set(fd_, ioWatcher_.events | ev::READ);}
+	void disableReading(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::READ);}
+	void enableWriting(){ioWatcher_.set(fd_, ioWatcher_.events | ev::WRITE);}
+	void disableWriting(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::WRITE);}
+	void disableAll(){ioWatcher_.set(fd_, ioWatcher_.events & ev::NONE);}
+
 	void setReadCallback(const EventCallback& cb)
 	{
 		readCallback_ = cb;

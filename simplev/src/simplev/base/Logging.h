@@ -27,7 +27,7 @@ public:
 
 	static void printAndAbort(const char* message)
 	{
-		::perror(message);
+		::puts(message);
 		::abort();
 	}
 };

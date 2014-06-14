@@ -1,7 +1,7 @@
 /*
- * main.cc
+ * test_Channel.cc
  *
- *  Created on: Jun 10, 2014
+ *  Created on: Jun 13, 2014
  *      Author: damonhao
  */
 
@@ -40,3 +40,5 @@ int main()
 
   return 0;
 }
+
+
