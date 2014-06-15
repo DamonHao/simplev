@@ -30,6 +30,7 @@ public:
 	~TimerQueue();
 	TimerId addTimer(const TimerCallback& cb, double after, double interval);
 	void cancel(TimerId timerId);
+	void clearExpiredTimer();
 private:
 //	typedef std::set<ev::timer*> TimerList;
 	typedef std::set<Timer *> TimerList;

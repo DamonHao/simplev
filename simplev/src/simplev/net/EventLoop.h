@@ -8,9 +8,13 @@
 #ifndef SIMPLEV_NET_EVENTLOOP_H_
 #define SIMPLEV_NET_EVENTLOOP_H_
 
+#include <vector>
+
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <ev++.h>
+#include <muduo/base/Mutex.h>
+
 
 #include <simplev/base/CurrentThread.h>
 #include <simplev/net/Callbacks.h>
@@ -22,10 +26,13 @@ namespace net
 {
 
 class TimerQueue;
+class Channel;
 
 class EventLoop: boost::noncopyable
 {
 public:
+	typedef boost::function<void()> Functor;
+
 	EventLoop();
 	~EventLoop();//make it out-line because boost::scoped_ptr<TimerQueue> timerQueue_;
 	void loop();
@@ -45,11 +52,35 @@ public:
   TimerId runAfter(double delay, const TimerCallback& cb);
   // Runs callback every @c interval seconds.
   TimerId runEvery(double interval, const TimerCallback& cb);
+
+  /// Runs callback immediately in the loop thread.
+   /// It wakes up the loop, and run the cb.
+   /// If in the same loop thread, cb is run within the function.
+   /// Safe to call from other threads.
+   void runInLoop(const Functor& cb);
+   /// called in other thread
+   /// Queues callback in the loop thread.
+   /// Runs after finish pooling.
+   /// Safe to call from other threads.
+   void queueInLoop(const Functor& cb);
+
+  // internal usage
+   void wakeup();
+
 private:
+  void prepareCallBack();
+  void handleRead();  // waked up
+  void doPendingFunctors();
 	ev::default_loop evLoop_;
-	bool looping_; /* atomic */
+	ev::prepare prepareWatcher_;
+	bool looping_; /* atomic */ //FIXME: why atomic?
+	bool callingPendingFunctors_; /* atomic */
 	const pid_t threadId_;
 	boost::scoped_ptr<TimerQueue> timerQueue_;
+	int wakeupFd_;
+	boost::scoped_ptr<Channel> wakeupChannel_;
+	muduo::MutexLock mutex_; //FIXME: changet to my own MutexLock;
+	std::vector<Functor> pendingFunctors_; // @BuardedBy mutex_
 };
 
 }

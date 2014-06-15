@@ -58,7 +58,6 @@ private:
 	EventCallback writeCallback_;
 	EventCallback errorCallback_;
 };
-
 }
 }
 

@@ -14,7 +14,7 @@ namespace simplev
 {
 namespace net
 {
-namespace socket
+namespace sockets
 {
 
 /// Creates a non-blocking socket file descriptor,
@@ -22,6 +22,8 @@ namespace socket
 
 int createNonblockingOrDie();
 void bindOrDie(int sockfd, const struct sockaddr_in& addr);
+ssize_t read(int sockfd, void *buf, size_t count);
+ssize_t write(int sockfd, const void *buf, size_t count);
 }
 }
 }

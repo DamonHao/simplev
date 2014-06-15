@@ -12,7 +12,7 @@ using namespace ev;
 using namespace simplev::net;
 
 Acceptor::Acceptor(loop_ref loop, const InetAddress& listenAddr) :
-		loop_(loop), acceptSocket_(socket::createNonblockingOrDie())
+		loop_(loop), acceptSocket_(sockets::createNonblockingOrDie())
 {
 
 }

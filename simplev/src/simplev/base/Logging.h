@@ -30,6 +30,7 @@ public:
 		::puts(message);
 		::abort();
 	}
+
 };
 
 }

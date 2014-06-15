@@ -24,7 +24,7 @@ void timerCallBack()
 void print(const char* msg)
 {
   puts(msg);
-  if (++cnt == 2)
+  if (++cnt == 20)
   {
     g_loop->quit();
   }
@@ -33,7 +33,7 @@ void print(const char* msg)
 int main()
 {
 	EventLoop loop;
-//	loop.runAfter(2.0, timerCallBack);
+	loop.runAfter(3.0, timerCallBack);
 	loop.runEvery(2, boost::bind(print, "every2"));
 	loop.loop();
 	return 0;

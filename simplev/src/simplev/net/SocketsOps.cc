@@ -5,14 +5,17 @@
  *      Author: damonhao
  */
 
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <simplev/base/Logging.h>
 #include <simplev/net/SocketsOps.h>
-#include <sys/socket.h>
+
 
 using namespace simplev::base;
 using namespace simplev::net;
 
-int socket::createNonblockingOrDie()
+int sockets::createNonblockingOrDie()
 {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
 			IPPROTO_TCP);
@@ -33,3 +36,12 @@ int socket::createNonblockingOrDie()
 //	}
 //}
 
+ssize_t sockets::read(int sockfd, void *buf, size_t count)
+{
+  return ::read(sockfd, buf, count);
+}
+
+ssize_t sockets::write(int sockfd, const void *buf, size_t count)
+{
+  return ::write(sockfd, buf, count);
+}

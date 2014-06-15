@@ -26,8 +26,10 @@ class Timer : boost::noncopyable
 {
 public:
 	Timer(EventLoop *loop, const TimerCallback& cb, double after, double interval);
+	~Timer();
 	void start();
 	void stop();
+	bool isActive(){return timeWatcher_.is_active();}
 private:
 	void run() {callBack_();} //as a call back run should be non-const
 	ev::timer timeWatcher_;
