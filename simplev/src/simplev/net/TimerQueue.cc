@@ -7,6 +7,8 @@
 
 #include <simplev/net/TimerQueue.h>
 
+#include <boost/bind.hpp>
+
 #include <simplev/net/EventLoop.h>
 #include <simplev/net/Timer.h>
 #include <simplev/net/TimerId.h>
@@ -29,11 +31,19 @@ TimerQueue::~TimerQueue()
 TimerId TimerQueue::addTimer(const TimerCallback& cb, double after,
 		double interval)
 {
+//	loop_->assertInLoopThread();
+	Timer * timer = new Timer(loop_, cb, after, interval);//thread for loop_;
+	loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
+//	timer->start();
+//	timers_.insert(timer);
+	return TimerId(timer);
+}
+
+void TimerQueue::addTimerInLoop(Timer* timer)
+{
 	loop_->assertInLoopThread();
-	Timer * timer = new Timer(loop_, cb, after, interval);
 	timer->start();
 	timers_.insert(timer);
-	return TimerId(timer);
 }
 
 void TimerQueue::cancel(TimerId timerId)

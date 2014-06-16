@@ -29,6 +29,7 @@ public:
 	TimerQueue(EventLoop* loop);
 	~TimerQueue();
 	TimerId addTimer(const TimerCallback& cb, double after, double interval);
+	void addTimerInLoop(Timer* timer);
 	void cancel(TimerId timerId);
 	void clearExpiredTimer();
 private:
