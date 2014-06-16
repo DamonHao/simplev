@@ -32,10 +32,8 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb, double after,
 		double interval)
 {
 //	loop_->assertInLoopThread();
-	Timer * timer = new Timer(loop_, cb, after, interval);//thread for loop_;
+	Timer * timer = new Timer(loop_, cb, after, interval);//thread safe for loop_;
 	loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
-//	timer->start();
-//	timers_.insert(timer);
 	return TimerId(timer);
 }
 
