@@ -151,4 +151,22 @@ void EventLoop::runInLoop(const Functor& cb)
 	}
 }
 
+void EventLoop::quitInLoop()
+{
+	assertInLoopThread();
+	evLoop_.break_loop();
+}
+
+//improve the thread safety;
+void EventLoop::quit()
+{
+	if(isInLoopThread())
+	{
+		quitInLoop();
+	}
+	else
+	{
+		queueInLoop(boost::bind(&EventLoop::quitInLoop, this));
+	}
+}
 

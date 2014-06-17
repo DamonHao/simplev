@@ -46,7 +46,10 @@ public:
   }
   bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
   ev::loop_ref getEventLoopRef() {return evLoop_;}
-  void quit(){evLoop_.break_loop();};
+
+  void quitInLoop();
+  void quit();
+//  void quit(){evLoop_.break_loop();};
 
   // Runs callback after @c delay seconds.
   TimerId runAfter(double delay, const TimerCallback& cb);
