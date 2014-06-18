@@ -19,6 +19,11 @@ namespace base
 class Logger
 {
 public:
+	static void perror(const char* errorInfo)
+	{
+		::perror(errorInfo);
+	}
+
 	static void perrorAndAbort(const char* errorInfo)
 	{
 		::perror(errorInfo);

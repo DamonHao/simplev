@@ -37,6 +37,10 @@ public:
 	/// On error, -1 is returned, and *peeraddr is untouched.
 	int accept(InetAddress* peeraddr);
 
+	int fd() {return sockfd_;}
+  // Enable/disable SO_REUSEADDR
+  void setReuseAddr(bool on);
+
 	void shutdownWrite();
 private:
 	const int sockfd_;

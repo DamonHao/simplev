@@ -5,12 +5,21 @@
  *      Author: damonhao
  */
 
+#include <simplev/net/SocketsOps.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include <simplev/base/Logging.h>
-#include <simplev/net/SocketsOps.h>
 
+
+//define __USE_GNU for accept4()
+#ifndef __USE_GNU
+#define __USE_GNU
+#endif
 
 using namespace simplev::base;
 using namespace simplev::net;
@@ -26,15 +35,63 @@ int sockets::createNonblockingOrDie()
 	return sockfd;
 }
 
-//void socket::bindOrDie(int sockfd, const struct sockaddr_in& addr)
-//{
-//	int ret = ::bind(sockfd, static_cast<const struct sockaddr*>(&addr),
-//			static_cast<socklen_t>(sizeof addr));
-//	if (ret < 0)
-//	{
-//		Logger::perrorAndAbort("sockets::bindOrDie");
-//	}
-//}
+void sockets::bindOrDie(int sockfd, const struct sockaddr_in& addr)
+{
+	int ret = ::bind(sockfd, static_cast<const struct sockaddr*>(static_cast<const void*>(&addr)),
+			static_cast<socklen_t>(sizeof addr));
+	if (ret < 0)
+	{
+		Logger::perrorAndAbort("sockets::bindOrDie");
+	}
+}
+
+void sockets::listenOrDie(int sockfd)
+{
+  int ret = ::listen(sockfd, SOMAXCONN);
+  if (ret < 0)
+  {
+  	Logger::perrorAndAbort("sockets::listenOrDie");
+  }
+}
+
+int sockets::accept(int sockfd, struct sockaddr_in* addr)
+{
+	socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
+	int connfd = ::accept4(sockfd, static_cast<struct sockaddr*>(static_cast<void*>(addr)),
+	                         &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
+  if (connfd < 0)
+  {
+    int savedErrno = errno;
+    Logger::perror("Socket::accept") ;
+    switch (savedErrno)
+    {
+      case EAGAIN:
+      case ECONNABORTED:
+      case EINTR:
+      case EPROTO: // ???
+      case EPERM:
+      case EMFILE: // per-process lmit of open file desctiptor ???
+        // expected errors
+        errno = savedErrno;
+        break;
+      case EBADF:
+      case EFAULT:
+      case EINVAL:
+      case ENFILE:
+      case ENOBUFS:
+      case ENOMEM:
+      case ENOTSOCK:
+      case EOPNOTSUPP:
+        // unexpected errors
+      	Logger::perrorAndAbort("unexpected error of ::accept ");
+        break;
+      default:
+      	Logger::perrorAndAbort("unknown error of ::accept ");
+        break;
+    }
+  }
+  return connfd;
+}
 
 ssize_t sockets::read(int sockfd, void *buf, size_t count)
 {
@@ -45,3 +102,33 @@ ssize_t sockets::write(int sockfd, const void *buf, size_t count)
 {
   return ::write(sockfd, buf, count);
 }
+
+void sockets::close(int fd)
+{
+	if(::close(fd) < 0)
+	{
+		Logger::perror("sockets::close");
+	}
+}
+
+void sockets::fromHostPort(const char* ip, uint16_t port,
+                           struct sockaddr_in* addr)
+{
+  addr->sin_family = AF_INET;
+  addr->sin_port = hostToNetwork16(port);
+  if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
+  {
+  	Logger::perrorAndAbort("sockets::fromHostPort");
+  }
+}
+
+void sockets::toIpPort(char* buf, size_t size, const struct sockaddr_in& addr)
+{
+  assert(size >= INET_ADDRSTRLEN);
+  ::inet_ntop(AF_INET, &addr.sin_addr, buf, static_cast<socklen_t>(size));
+  size_t end = ::strlen(buf);
+  uint16_t port = sockets::networkToHost16(addr.sin_port);
+  assert(size > end);
+  snprintf(buf+end, size-end, ":%u", port);
+}
+
