@@ -11,6 +11,16 @@
 #include <stdio.h> //perror()
 #include <stdlib.h> //abort()
 
+namespace
+{
+template <typename T> T* checkNotNULL( T* const ptr)
+{
+	assert(ptr != NULL);
+	return ptr;
+}
+}
+
+
 namespace simplev
 {
 namespace base
@@ -36,6 +46,7 @@ public:
 		::abort();
 	}
 
+	static const char* strerror_tl(int savedErrno);
 };
 
 }

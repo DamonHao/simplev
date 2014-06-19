@@ -68,12 +68,14 @@ public:
    void queueInLoop(const Functor& cb);
 
   // internal usage
-   void wakeup();
+  void wakeup();
+  void removeChannel(Channel* channel);
 
 private:
   void prepareCallBack();
   void handleRead();  // waked up
   void doPendingFunctors();
+
 	ev::default_loop evLoop_;
 	ev::prepare prepareWatcher_;
 	bool looping_; /* atomic */ //FIXME: why atomic?

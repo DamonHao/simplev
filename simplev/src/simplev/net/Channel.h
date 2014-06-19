@@ -28,12 +28,17 @@ class Channel: boost::noncopyable
 public:
 	typedef boost::function<void()> EventCallback;
 	Channel(EventLoop* loop, int fd);
-//	~Channel();
+	~Channel();
 	void enableReading(){ioWatcher_.set(fd_, ioWatcher_.events | ev::READ);}
 	void disableReading(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::READ);}
 	void enableWriting(){ioWatcher_.set(fd_, ioWatcher_.events | ev::WRITE);}
 	void disableWriting(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::WRITE);}
 	void disableAll(){ioWatcher_.set(fd_, ioWatcher_.events & ev::NONE);}
+	int fd(){return fd_;}
+	bool isNoneEvent() const { return ioWatcher_.events == ev::NONE; }
+	void remove();
+	void stop();
+	EventLoop* ownerLoop() { return loop_; }
 
 	void setReadCallback(const EventCallback& cb)
 	{
@@ -47,12 +52,14 @@ public:
 	{
 		errorCallback_ = cb;
 	}
+
 private:
 	void handleEvent(ev::io &io_watcher, int revents);
 
 	EventLoop* loop_;
 	const int fd_;
 	ev::io ioWatcher_;
+	bool eventHandling_;
 
 	EventCallback readCallback_;
 	EventCallback writeCallback_;

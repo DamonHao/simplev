@@ -170,3 +170,9 @@ void EventLoop::quit()
 	}
 }
 
+void EventLoop::removeChannel(Channel* channel)
+{
+	assert(channel->ownerLoop() == this);
+//	assertInLoopThread();
+	channel->stop();
+}
