@@ -84,7 +84,7 @@ private:
 	boost::scoped_ptr<TimerQueue> timerQueue_;
 	int wakeupFd_;
 	boost::scoped_ptr<Channel> wakeupChannel_;
-	muduo::MutexLock mutex_; //FIXME: changet to my own MutexLock;
+	muduo::MutexLock mutex_; //FIXME: change to my own MutexLock;
 	std::vector<Functor> pendingFunctors_; // @BuardedBy mutex_
 };
 

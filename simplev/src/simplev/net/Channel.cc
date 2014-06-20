@@ -42,7 +42,9 @@ void Channel::handleEvent(ev::io &io_watcher, int revents)
 	{
 		if (readCallback_)
 		{
-			readCallback_();
+//			readCallback_();
+			Timestamp now(loop_->getEventLoopRef().now());
+			readCallback_(now);
 		}
 	}
 	if (revents & ev::WRITE)

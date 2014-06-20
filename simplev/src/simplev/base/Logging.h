@@ -18,6 +18,12 @@ template <typename T> T* checkNotNULL( T* const ptr)
 	assert(ptr != NULL);
 	return ptr;
 }
+
+template<typename To, typename From>
+inline To implicit_cast(From const &f) {
+    return f;
+}
+
 }
 
 

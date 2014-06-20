@@ -13,6 +13,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <simplev/net/Buffer.h>
 #include <simplev/net/Callbacks.h>
 #include <simplev/net/InetAddress.h>
 
@@ -64,7 +65,8 @@ private:
 	enum StateE { kConnecting, kConnected, kDisconnected};
 
 	void setState(StateE s) { state_ = s; }
-	void handleRead();
+//	void handleRead();
+	void handleRead(Timestamp receiveTime );
 	void handleWrite();
 	void handleClose();
 	void handleError();
@@ -80,6 +82,7 @@ private:
 	ConnectionCallback connectionCallback_;
 	MessageCallback messageCallback_;
 	CloseCallback closeCallback_;
+	Buffer inputBuffer_;
 };
 
 }

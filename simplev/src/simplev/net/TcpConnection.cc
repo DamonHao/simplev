@@ -7,6 +7,7 @@
 #include <simplev/net/TcpConnection.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 
 #include <string>
@@ -34,11 +35,12 @@ using namespace simplev::net;
 		socket_(new Socket(sockfd)),
 		channel_(new Channel(loop, sockfd)),
 		localAddr_(localAddr),
-		peerAddr_(peerAddr)
+		peerAddr_(peerAddr),
+		inputBuffer_()
  {
 	 printf("TcpConnection::ctor[%s], fd= %d\n", name_.c_str(), sockfd);
 	 channel_->setReadCallback(
-	       boost::bind(&TcpConnection::handleRead, this));
+	       boost::bind(&TcpConnection::handleRead, this, _1));
  }
 
  TcpConnection::~TcpConnection()
@@ -55,17 +57,19 @@ void TcpConnection::connectEstablished()
 	connectionCallback_(shared_from_this());
 }
 
-void TcpConnection::handleRead()
+void TcpConnection::handleRead(Timestamp receiveTime )
 {
-	char buf[65536];
-	ssize_t n = sockets::read(channel_->fd(), buf, sizeof buf);
+	int savedErrno = 0;
+	ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
 	if(n > 0)
 	{
-		messageCallback_(shared_from_this(), buf, n);
+		messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
 	}
 	else if(n == 0)
 	{
 //		sockets::close(channel_->fd());
+		errno = savedErrno;
+		Logger::perror("TcpConnection::handleRead");
 		handleClose();
 	}
 	else
@@ -74,6 +78,7 @@ void TcpConnection::handleRead()
 		Logger::perrorAndAbort("TcpConnection::handleRead");
 	}
 }
+
 
 void TcpConnection::handleClose()
 {

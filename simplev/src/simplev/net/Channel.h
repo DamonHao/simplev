@@ -12,6 +12,8 @@
 #include <boost/noncopyable.hpp>
 #include <ev++.h>
 
+#include <simplev/base/Timestamp.h>
+
 namespace simplev
 {
 namespace net
@@ -27,6 +29,8 @@ class Channel: boost::noncopyable
 {
 public:
 	typedef boost::function<void()> EventCallback;
+	typedef boost::function<void(Timestamp)> ReadEventCallback;
+
 	Channel(EventLoop* loop, int fd);
 	~Channel();
 	void enableReading(){ioWatcher_.set(fd_, ioWatcher_.events | ev::READ);}
@@ -40,7 +44,7 @@ public:
 	void stop();
 	EventLoop* ownerLoop() { return loop_; }
 
-	void setReadCallback(const EventCallback& cb)
+	void setReadCallback(const ReadEventCallback& cb)
 	{
 		readCallback_ = cb;
 	}
@@ -61,7 +65,8 @@ private:
 	ev::io ioWatcher_;
 	bool eventHandling_;
 
-	EventCallback readCallback_;
+	ReadEventCallback readCallback_;
+//	EventCallback readCallback_;
 	EventCallback writeCallback_;
 	EventCallback errorCallback_;
 };
