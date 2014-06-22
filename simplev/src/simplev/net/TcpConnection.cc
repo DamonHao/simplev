@@ -36,7 +36,9 @@ using namespace simplev::net;
 		channel_(new Channel(loop, sockfd)),
 		localAddr_(localAddr),
 		peerAddr_(peerAddr),
-		inputBuffer_()
+		highWaterMark_(64*1024*1024),
+		inputBuffer_(),
+		outputBuffer_()
  {
 	 printf("TcpConnection::ctor[%s], fd= %d\n", name_.c_str(), sockfd);
 	 channel_->setReadCallback(
@@ -112,6 +114,11 @@ void TcpConnection::handleWrite()
 			if(outputBuffer_.readableBytes() == 0)
 			{
 				channel_->disableWriting();
+				if(writeCompleteCallback_)
+				{
+					//Not call writeCompleteCallback_ directly to reduce time-delay;
+					loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
+				}
 				if(state_ == kDisconnecting)
 				{
 					shutdownInLoop();
@@ -119,7 +126,7 @@ void TcpConnection::handleWrite()
 			}
 			else
 			{
-				Logger::puts("going to write more data");
+				Logger::puts("TcpConnection::handleWrite: going to write more data");
 			}
 		}
 		else
@@ -173,6 +180,8 @@ void TcpConnection::sendInLoop(const std::string& message)
 {
 	loop_->assertInLoopThread();
 	ssize_t numWrite = 0;
+	size_t remaining = message.size();
+	bool faultError = false;
 	//if nothing in the output buffer, try writing directly
 	if(!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
 	{
@@ -180,10 +189,21 @@ void TcpConnection::sendInLoop(const std::string& message)
 		numWrite = sockets::write(channel_->fd(), message.data(), message.size());
 		if(numWrite  >= 0)
 		{
-			if(implicit_cast<size_t>(numWrite) < message.size())
+			remaining = remaining - numWrite;
+			if(remaining == 0 && writeCompleteCallback_)
 			{
-				Logger::puts("going to write more data");
+					//Not call writeCompleteCallback_ directly to reduce time-delay;
+					loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
 			}
+//			if(implicit_cast<size_t>(numWrite) < message.size())
+//			{
+//				Logger::puts("going to write more data");
+//			}
+//			else if(writeCompleteCallback_)
+//			{
+//				//Not call writeCompleteCallback_ directly to reduce time-delay;
+//				loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
+//			}
 		}
 		else
 		{
@@ -191,18 +211,38 @@ void TcpConnection::sendInLoop(const std::string& message)
 			if(errno != EWOULDBLOCK)
 			{
 				Logger::perror("TcpConnection::sendInLoop");
+        if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
+        {
+          faultError = true;
+        }
 			}
 		}
 	}
 
 	assert(numWrite >= 0);
-	if(implicit_cast<size_t>(numWrite) < message.size())
+//	assert(remaining <= len);
+//	if(implicit_cast<size_t>(numWrite) < message.size())
+//	{
+//		outputBuffer_.append(message.data()+numWrite, message.size() - numWrite);
+//		if(!channel_->isWriting())
+//		{
+//			channel_->enableWriting();
+//		}
+//	}
+	if(!faultError && remaining >0)
 	{
-		outputBuffer_.append(message.data()+numWrite, message.size() - numWrite);
-		if(!channel_->isWriting())
-		{
-			channel_->enableWriting();
-		}
+		 size_t oldLen = outputBuffer_.readableBytes();
+		 if(oldLen + remaining >= highWaterMark_
+				 && oldLen < highWaterMark_
+				 && highWaterMarkCallback_)
+		 {
+			 loop_->queueInLoop(boost::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
+		 }
+		 outputBuffer_.append(message.data()+numWrite, remaining);
+		 if(!channel_->isWriting())
+		 {
+			 channel_->enableWriting();
+		 }
 	}
 }
 

@@ -13,7 +13,10 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <simplev/net/Callbacks.h>
+//add TcpConnection.h here for the convenient usage of TcpServer.
+//offer tpye: InetAddress, Callbacks
+#include <simplev/net/TcpConnection.h>
+//#include <simplev/net/Callbacks.h>
 
 namespace simplev
 {
@@ -22,7 +25,7 @@ namespace net
 
 class Acceptor;
 class EventLoop;
-class InetAddress;
+//class InetAddress;
 
 class TcpServer: boost::noncopyable
 {
@@ -43,6 +46,11 @@ public:
   /// Not thread safe.
   void setMessageCallback(const MessageCallback& cb)
   { messageCallback_ = cb; }
+
+  /// Set write complete callback.
+  /// Not thread safe.
+  void setWriteCompleteCallback(const WriteCompleteCallback& cb)
+  { writeCompleteCallback_ = cb; }
 private:
 	/// Not thread safe, but in loop
 	void newConnection(int sockfd, const InetAddress& peerAddr);
@@ -55,6 +63,7 @@ private:
 	boost::scoped_ptr<Acceptor> acceptor_; // avoid revealing Acceptor
 	ConnectionCallback connectionCallback_;
 	MessageCallback messageCallback_;
+	WriteCompleteCallback writeCompleteCallback_;
 	bool started_;
 	int nextConnId_;  // always in loop thread
 	ConnectionMap connections_;
