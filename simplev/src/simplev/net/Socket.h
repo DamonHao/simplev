@@ -38,10 +38,21 @@ public:
 	int accept(InetAddress* peeraddr);
 
 	int fd() {return sockfd_;}
+
+	void shutdownWrite();
+
+  // Enable/disable SO_KEEPALIVE
+  void setKeepAlive(bool on);
+
   // Enable/disable SO_REUSEADDR
   void setReuseAddr(bool on);
 
-	void shutdownWrite();
+  // Enable/disable SO_REUSEPORT
+  void setReusePort(bool on);
+
+	// Enable/disable TCP_NODELAY (disable/enable Nagle's algorithm).
+	void setTcpNoDelay(bool on);
+
 private:
 	const int sockfd_;
 };

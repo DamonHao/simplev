@@ -53,6 +53,11 @@ public:
 	}
 
 	static const char* strerror_tl(int savedErrno);
+
+	static void puts(const char* message)
+	{
+		::puts(message);//note not to ignore ::, otherwise cause infinite loop;
+	}
 };
 
 }

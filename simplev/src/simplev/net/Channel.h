@@ -37,12 +37,14 @@ public:
 	void disableReading(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::READ);}
 	void enableWriting(){ioWatcher_.set(fd_, ioWatcher_.events | ev::WRITE);}
 	void disableWriting(){ioWatcher_.set(fd_, ioWatcher_.events & ~ev::WRITE);}
-	void disableAll(){ioWatcher_.set(fd_, ioWatcher_.events & ev::NONE);}
+	bool isWriting() const { return ioWatcher_.events & ev::WRITE; }
+	void disableAll(){ioWatcher_.set(fd_, ev::NONE);}//ioWatcher_.events & ev::NONE
 	int fd(){return fd_;}
 	bool isNoneEvent() const { return ioWatcher_.events == ev::NONE; }
 	void remove();
 	void stop();
 	EventLoop* ownerLoop() { return loop_; }
+
 
 	void setReadCallback(const ReadEventCallback& cb)
 	{

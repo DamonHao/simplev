@@ -34,6 +34,18 @@ int createEventfd()
 	return evtfd;
 }
 
+class IgnoreSigPipe
+{
+ public:
+  IgnoreSigPipe()
+  {
+    ::signal(SIGPIPE, SIG_IGN);
+    Logger::puts("Ignore SIGPIPE");
+  }
+};
+
+IgnoreSigPipe initObj;
+
 }
 
 EventLoop::EventLoop() :
@@ -141,7 +153,7 @@ void EventLoop::queueInLoop(const Functor& cb)
 
 void EventLoop::runInLoop(const Functor& cb)
 {
-	if(isInLoopThread())
+	if (isInLoopThread())
 	{
 		cb();
 	}
@@ -160,7 +172,7 @@ void EventLoop::quitInLoop()
 //improve the thread safety;
 void EventLoop::quit()
 {
-	if(isInLoopThread())
+	if (isInLoopThread())
 	{
 		quitInLoop();
 	}

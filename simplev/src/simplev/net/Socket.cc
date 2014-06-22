@@ -8,10 +8,14 @@
 #include <simplev/net/Socket.h>
 
 #include <strings.h> //bzero()
+#include <netinet/in.h> //Internet address family
+#include <netinet/tcp.h> // TCP_NODELAY
 
+#include <simplev/base/Logging.h>
 #include <simplev/net/InetAddress.h>
 #include <simplev/net/SocketsOps.h>
 
+using namespace simplev::base;
 using namespace simplev::net;
 
 Socket::~Socket()
@@ -24,12 +28,7 @@ void Socket::bindAddress(const InetAddress& localaddr)
 	sockets::bindOrDie(sockfd_, localaddr.getSockAddrInet());
 }
 
-void Socket::setReuseAddr(bool on)
-{
-	int optval = on ? 1 : 0;
-	::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
-	// FIXME: CHECK
-}
+
 
 void Socket::listen()
 {
@@ -46,4 +45,59 @@ int Socket::accept(InetAddress* peeraddr)
 		peeraddr->setSockAddrInet(addr);
 	}
 	return connfd;
+}
+
+void Socket::shutdownWrite()
+{
+  sockets::shutdownWrite(sockfd_);
+}
+
+void Socket::setReuseAddr(bool on)
+{
+	int optval = on ? 1 : 0;
+	 int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+	 if(ret < 0)
+	 {
+		 Logger::perror("Socket::setReuseAddr failed.");
+	 }
+}
+
+void Socket::setReusePort(bool on)
+{
+#ifdef SO_REUSEPORT
+  int optval = on ? 1 : 0;
+  int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEPORT,
+                         &optval, static_cast<socklen_t>(sizeof optval));
+  if (ret < 0)
+  {
+    Logger::perror("SO_REUSEPORT failed.");
+  }
+#else
+  if (on)
+  {
+  	Logger::puts("SO_REUSEPORT is not supported.") ;
+  }
+#endif
+}
+
+void Socket::setTcpNoDelay(bool on)
+{
+	int optval = on ? 1 : 0;
+	int ret = ::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY,
+							 &optval, static_cast<socklen_t>(sizeof optval));
+	if(ret < 0)
+	{
+		Logger::perror("Socket::setTcpNoDelay failed.");
+	}
+}
+
+void Socket::setKeepAlive(bool on)
+{
+  int optval = on ? 1 : 0;
+  int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_KEEPALIVE,
+               &optval, static_cast<socklen_t>(sizeof optval));
+	if(ret < 0)
+	{
+		Logger::perror("Socket::setKeepAlive failed.");
+	}
 }

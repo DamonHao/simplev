@@ -45,11 +45,21 @@ public:
 	 const InetAddress& peerAddress() { return peerAddr_; }
 	 bool connected() const { return state_ == kConnected; }
 
+	 // Thread safe.
+	 void send(const std::string& message);
+	 // Thread safe.
+	 void shutdown();
+
+	 void setKeepAlive(bool on);
+	 void setTcpNoDelay(bool on);
 	 void setConnectionCallback(const ConnectionCallback& cb)
 	 { connectionCallback_ = cb; }
 
 	 void setMessageCallback(const MessageCallback& cb)
 	 { messageCallback_ = cb; }
+
+		void setCloseCallback(const CloseCallback& cb)
+		{ closeCallback_ = cb; }
 
 	 /// Internal use only.
 	// called when TcpServer accepts a new connection
@@ -57,12 +67,11 @@ public:
   // called when TcpServer has removed me from its map
   void connectDestroyed();  // should be called only once
 
-	void setCloseCallback(const CloseCallback& cb)
-	{ closeCallback_ = cb; }
+
 
 
 private:
-	enum StateE { kConnecting, kConnected, kDisconnected};
+	enum StateE { kConnecting, kConnected, kDisconnecting, kDisconnected};
 
 	void setState(StateE s) { state_ = s; }
 //	void handleRead();
@@ -70,6 +79,8 @@ private:
 	void handleWrite();
 	void handleClose();
 	void handleError();
+  void sendInLoop(const std::string& message);
+  void shutdownInLoop();
 
 	EventLoop* loop_;
 	std::string name_;
@@ -83,6 +94,7 @@ private:
 	MessageCallback messageCallback_;
 	CloseCallback closeCallback_;
 	Buffer inputBuffer_;
+	Buffer outputBuffer_;
 };
 
 }

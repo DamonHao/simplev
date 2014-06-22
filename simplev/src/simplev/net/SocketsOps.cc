@@ -96,6 +96,14 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
 	return connfd;
 }
 
+void sockets::shutdownWrite(int sockfd)
+{
+  if (::shutdown(sockfd, SHUT_WR) < 0)
+  {
+  	Logger::perrorAndAbort("sockets::shutdownWrite");
+  }
+}
+
 ssize_t sockets::read(int sockfd, void *buf, size_t count)
 {
 	return ::read(sockfd, buf, count);
