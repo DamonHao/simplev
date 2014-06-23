@@ -76,7 +76,8 @@ private:
   void handleRead();  // waked up
   void doPendingFunctors();
 
-	ev::default_loop evLoop_;
+//	ev::default_loop evLoop_;
+  ev::dynamic_loop evLoop_;
 	ev::prepare prepareWatcher_;
 	bool looping_; /* atomic */ //FIXME: why atomic?
 	bool callingPendingFunctors_; /* atomic */

@@ -73,6 +73,7 @@ EventLoop::~EventLoop()
 
 void EventLoop::abortNotInLoopThread()
 {
+	printf("EventLoop was created in thread: %d, and current thread: %d\n", threadId_, CurrentThread::tid());
 	Logger::printAndAbort("EventLoop::abortNotInLoopThread");
 }
 
