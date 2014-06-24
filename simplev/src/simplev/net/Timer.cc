@@ -13,9 +13,13 @@
 
 using namespace simplev::net;
 
+muduo::AtomicInt64 Timer::s_numCreated_;
+
 Timer::Timer(EventLoop *loop, const TimerCallback& cb, double after,
 		double interval) :
-		timeWatcher_(loop->getEventLoopRef()), callBack_(cb)
+		timeWatcher_(loop->getEventLoopRef()),
+		sequence_(s_numCreated_.incrementAndGet()),
+		callBack_(cb)
 {
 	printf("Timer: %d\n", reinterpret_cast<int>(this));
 	timeWatcher_.set<Timer, &Timer::run>(this);

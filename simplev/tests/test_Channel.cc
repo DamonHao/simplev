@@ -15,7 +15,14 @@ using namespace simplev::net;
 
 EventLoop *  g_loop;
 
-void timeout()
+
+//void timeout()
+//{
+//  printf("Timeout!\n");
+//  g_loop->quit();
+//}
+
+void timeout(simplev::Timestamp receiveTime)
 {
   printf("Timeout!\n");
   g_loop->quit();

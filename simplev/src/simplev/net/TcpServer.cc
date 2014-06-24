@@ -58,6 +58,16 @@ void TcpServer::start()
 void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 {
 	loop_->assertInLoopThread();
+	//poll with zero timeout to double confirm the new connection
+	struct pollfd pfds[1];
+	pfds[0].fd = sockfd;
+	pfds[0].events = POLLOUT;
+	if(::poll(pfds, 1, 0) < 0)
+	{
+		Logger::perror("TcpServer::newConnection - invalid sockfd");
+		sockets::close(sockfd);
+		return;
+	}
 	char buf[32];
 	snprintf(buf, sizeof buf, "#%d", nextConnId_);
 	++nextConnId_;
@@ -66,16 +76,6 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	printf("TcpServer::newConnection[%s] from new connection %s\n", name_.c_str(),
 			connName.c_str());
 	InetAddress localAddr(sockets::getLocalAddr(sockfd));
-	//poll with zero timeout to double confirm the new connection
-	struct pollfd pfds[1];
-	pfds[0].fd = sockfd;
-	pfds[0].events = POLLOUT;
-	if(::poll(pfds, 1, 0) < 0)
-	{
-		Logger::perror("TcpServer::newConnection");
-		//FIXME: who clean sockfd??
-		return;
-	}
 	EventLoop* ioLoop = threadPool_->getNextLoop();
 	TcpConnectionPtr conn(
 				new TcpConnection(ioLoop, connName, sockfd, localAddr, peerAddr));

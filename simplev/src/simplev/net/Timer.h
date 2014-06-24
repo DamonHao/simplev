@@ -11,6 +11,8 @@
 #include <boost/noncopyable.hpp>
 #include <ev++.h>
 
+#include <muduo/base/Atomic.h>
+
 #include <simplev/net/Callbacks.h>
 
 namespace simplev
@@ -30,11 +32,14 @@ public:
 	void start();
 	void stop();
 	bool isActive(){return timeWatcher_.is_active();}
+	int64_t sequence() const { return sequence_; }
 private:
 	void run() {callBack_();} //as a call back run should be non-const
 	ev::timer timeWatcher_;
+	const int64_t sequence_;
 	TimerCallback callBack_;
 
+	static muduo::AtomicInt64 s_numCreated_;
 };
 
 

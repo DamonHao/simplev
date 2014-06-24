@@ -16,15 +16,19 @@
 using namespace simplev::net;
 
 TimerQueue::TimerQueue(EventLoop* loop) :
-		loop_(loop), timers_()
+		loop_(loop), validTimers_()
 {
 }
 
 TimerQueue::~TimerQueue()
 {
-	for (TimerList::iterator it = timers_.begin(); it != timers_.end(); ++it)
+//	for (TimerList::iterator it = timers_.begin(); it != timers_.end(); ++it)
+//	{
+//		delete *it;
+//	}
+	for (ValidTimerSet::iterator it = validTimers_.begin(); it != validTimers_.end(); ++it)
 	{
-		delete *it;
+		delete it->first ;
 	}
 }
 
@@ -34,37 +38,47 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb, double after,
 //	loop_->assertInLoopThread();
 	Timer * timer = new Timer(loop_, cb, after, interval);//thread safe for loop_;
 	loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
-	return TimerId(timer);
+	return TimerId(timer, timer->sequence());
 }
 
 void TimerQueue::addTimerInLoop(Timer* timer)
 {
 	loop_->assertInLoopThread();
 	timer->start();
-	timers_.insert(timer);
+//	timers_.insert(timer);
+	validTimers_.insert(ValidTimer(timer, timer->sequence()));
 }
 
 void TimerQueue::cancel(TimerId timerId)
 {
-	timerId.timer_->stop();
-//	timers_.erase(timerId.timer_); //FIXME: It is the right time to delete?
-//	delete timerId.timer_;
+	loop_->runInLoop(boost::bind(&TimerQueue::cancelInLoop, this, timerId));
+}
+
+void TimerQueue::cancelInLoop(TimerId timerId)
+{
+	loop_->assertInLoopThread();
+	ValidTimer timer(timerId.timer_, timerId.sequence_);
+	ValidTimerSet::iterator it = validTimers_.find(timer);
+	if(it != validTimers_.end())
+	{
+		timerId.timer_->stop(); //Let TimerQueue::clearExpiredTimer clean this inactive timer;
+	}
 }
 
 void TimerQueue::clearExpiredTimer()
 {
-	TimerList::iterator itEnd = timers_.end();
-	TimerList::iterator itBegin = timers_.begin();
+	ValidTimerSet::iterator itEnd = validTimers_.end();
+	ValidTimerSet::iterator itBegin = validTimers_.begin();
 	while(itBegin != itEnd)
 	{
-		if((*itBegin)->isActive())
+		if(itBegin->first->isActive())
 		{
 			++itBegin;
 		}
 		else
 		{
-			delete *itBegin;
-			timers_.erase(itBegin++);
+			delete itBegin->first;
+			validTimers_.erase(itBegin++);
 		}
 	}
 }

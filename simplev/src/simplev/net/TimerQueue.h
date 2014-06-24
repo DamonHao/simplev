@@ -30,14 +30,22 @@ public:
 	~TimerQueue();
 	TimerId addTimer(const TimerCallback& cb, double after, double interval);//thread safe;
 	void addTimerInLoop(Timer* timer);
-	void cancel(TimerId timerId);
 	void clearExpiredTimer();
-private:
-//	typedef std::set<ev::timer*> TimerList;
-	typedef std::set<Timer *> TimerList;
-	EventLoop* loop_;
-	TimerList timers_;
 
+	//thread safe
+	void cancel(TimerId timerId);
+
+private:
+	void cancelInLoop(TimerId timerId);
+
+
+//	typedef std::set<ev::timer*> TimerList;
+	typedef std::set<Timer*> TimerList;
+	typedef std::pair<Timer* , int64_t> ValidTimer;
+	typedef std::set<ValidTimer> ValidTimerSet;
+	EventLoop* loop_;
+//	TimerList timers_;
+	ValidTimerSet validTimers_;
 };
 }
 }

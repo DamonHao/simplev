@@ -15,7 +15,6 @@
 #include <ev++.h>
 #include <muduo/base/Mutex.h>
 
-
 #include <simplev/base/CurrentThread.h>
 #include <simplev/net/Callbacks.h>
 #include <simplev/net/TimerId.h>
@@ -34,52 +33,61 @@ public:
 	typedef boost::function<void()> Functor;
 
 	EventLoop();
-	~EventLoop();//make it out-line because boost::scoped_ptr<TimerQueue> timerQueue_;
+	~EventLoop(); //make it out-line because boost::scoped_ptr<TimerQueue> timerQueue_;
 	void loop();
 	void abortNotInLoopThread();
-  void assertInLoopThread()
-  {
-    if (!isInLoopThread())
-    {
-      abortNotInLoopThread();
-    }
-  }
-  bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
-  ev::loop_ref getEventLoopRef() {return evLoop_;}
+	void assertInLoopThread()
+	{
+		if (!isInLoopThread())
+		{
+			abortNotInLoopThread();
+		}
+	}
+	bool isInLoopThread() const
+	{
+		return threadId_ == CurrentThread::tid();
+	}
+	ev::loop_ref getEventLoopRef()
+	{
+		return evLoop_;
+	}
 
-  void quitInLoop();
-  void quit();
-//  void quit(){evLoop_.break_loop();};
+//	void quitInLoop();
+	void quit();
 
-  // Runs callback after @c delay seconds.
-  TimerId runAfter(double delay, const TimerCallback& cb);
-  // Runs callback every @c interval seconds.
-  TimerId runEvery(double interval, const TimerCallback& cb);
+	// Runs callback after @c delay seconds. Thread safe.
+	TimerId runAfter(double delay, const TimerCallback& cb);
+	// Runs callback every @c interval seconds. Thread safe.
+	TimerId runEvery(double interval, const TimerCallback& cb);
+	// Thread safe;
+	void cancel(TimerId timerId);
 
-  /// Runs callback immediately in the loop thread.
-   /// It wakes up the loop, and run the cb.
-   /// If in the same loop thread, cb is run within the function.
-   /// Safe to call from other threads.
-   void runInLoop(const Functor& cb);
-   /// called in other thread
-   /// Queues callback in the loop thread.
-   /// Runs after finish pooling.
-   /// Safe to call from other threads.
-   void queueInLoop(const Functor& cb);
+	/// Runs callback immediately in the loop thread.
+	/// It wakes up the loop, and run the cb.
+	/// If in the same loop thread, cb is run within the function.
+	/// Safe to call from other threads.
+	void runInLoop(const Functor& cb);
+	/// called in other thread
+	/// Queues callback in the loop thread.
+	/// Runs after finish pooling.
+	/// Safe to call from other threads.
+	void queueInLoop(const Functor& cb);
 
-  // internal usage
-  void wakeup();
-  void removeChannel(Channel* channel);
+	// internal usage
+	void wakeup();
+	void removeChannel(Channel* channel);
 
 private:
-  void prepareCallBack();
-  void handleRead();  // waked up
-  void doPendingFunctors();
+	void prepareCallBack(); // only executed in loop
+	void handleRead();  // waked up
+	void doPendingFunctors();
 
-//	ev::default_loop evLoop_;
-  ev::dynamic_loop evLoop_;
-	ev::prepare prepareWatcher_;
+
 	bool looping_; /* atomic */ //FIXME: why atomic?
+	bool quit_; /* atomic */
+//	ev::default_loop evLoop_;
+	ev::dynamic_loop evLoop_;
+	ev::prepare prepareWatcher_;
 	bool callingPendingFunctors_; /* atomic */
 	const pid_t threadId_;
 	boost::scoped_ptr<TimerQueue> timerQueue_;

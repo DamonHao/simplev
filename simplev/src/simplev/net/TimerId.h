@@ -9,7 +9,6 @@
 #define SIMPLEV_NET_TIMERID_H_
 
 #include <simplev/base/copyable.h>
-//#include <ev++.h>
 
 namespace simplev
 {
@@ -20,8 +19,10 @@ class Timer;
 
 class TimerId: public simplev::copyable
 {
-	TimerId(Timer *timer) :
-			timer_(timer)
+public:
+	TimerId(Timer* timer = NULL, int64_t seq = 0) :
+			timer_(timer),
+			sequence_(seq)
 	{
 	}
 
@@ -30,7 +31,7 @@ class TimerId: public simplev::copyable
 	friend class TimerQueue;
 private:
 	Timer *timer_;
-
+	int64_t sequence_;
 };
 
 }

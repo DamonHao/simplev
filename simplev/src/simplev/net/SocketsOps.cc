@@ -14,7 +14,6 @@
 #include <sys/uio.h> //readv()
 #include <unistd.h>
 
-
 #include <simplev/base/Logging.h>
 
 //define __USE_GNU for accept4()
@@ -24,6 +23,21 @@
 
 using namespace simplev::base;
 using namespace simplev::net;
+
+namespace
+{
+typedef struct sockaddr SA;
+
+const SA* sockaddr_cast(const struct sockaddr_in* addr)
+{
+	return static_cast<const SA*>(implicit_cast<const void*>(addr));
+}
+
+SA* sockaddr_cast(struct sockaddr_in* addr)
+{
+	return static_cast<SA*>(implicit_cast<void*>(addr));
+}
+}
 
 int sockets::createNonblockingOrDie()
 {
@@ -98,10 +112,10 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
 
 void sockets::shutdownWrite(int sockfd)
 {
-  if (::shutdown(sockfd, SHUT_WR) < 0)
-  {
-  	Logger::perrorAndAbort("sockets::shutdownWrite");
-  }
+	if (::shutdown(sockfd, SHUT_WR) < 0)
+	{
+		Logger::perrorAndAbort("sockets::shutdownWrite");
+	}
 }
 
 ssize_t sockets::read(int sockfd, void *buf, size_t count)
@@ -111,7 +125,7 @@ ssize_t sockets::read(int sockfd, void *buf, size_t count)
 
 ssize_t sockets::readv(int sockfd, const struct iovec *iov, int iovcnt)
 {
-  return ::readv(sockfd, iov, iovcnt);
+	return ::readv(sockfd, iov, iovcnt);
 }
 
 ssize_t sockets::write(int sockfd, const void *buf, size_t count)
@@ -164,15 +178,42 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd)
 
 int sockets::getSocketError(int sockfd)
 {
-  int optval;
-  socklen_t optlen = sizeof optval;
+	int optval;
+	socklen_t optlen = sizeof optval;
 
-  if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
-  {
-    return errno;
-  }
-  else
-  {
-    return optval;
-  }
+	if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
+	{
+		return errno;
+	}
+	else
+	{
+		return optval;
+	}
+}
+
+int sockets::connect(int sockfd, const struct sockaddr_in& addr)
+{
+//	return ::connect(sockfd,
+//			static_cast<struct sockaddr*>(static_cast<void*>(&addr)), sizeof addr);
+	return ::connect(sockfd,sockaddr_cast(&addr), sizeof addr);
+}
+
+struct sockaddr_in sockets::getPeerAddr(int sockfd)
+{
+	struct sockaddr_in peeraddr;
+	bzero(&peeraddr, sizeof peeraddr);
+	socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+	if (::getpeername(sockfd, sockaddr_cast(&peeraddr), &addrlen) < 0)
+	{
+		Logger::perror("sockets::getPeerAddr");
+	}
+	return peeraddr;
+}
+
+bool sockets::isSelfConnect(int sockfd)
+{
+	struct sockaddr_in localaddr = getLocalAddr(sockfd);
+	struct sockaddr_in peeraddr = getPeerAddr(sockfd);
+	return localaddr.sin_port == peeraddr.sin_port
+			&& localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
 }

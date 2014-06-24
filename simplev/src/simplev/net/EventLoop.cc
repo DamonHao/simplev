@@ -49,10 +49,15 @@ IgnoreSigPipe initObj;
 }
 
 EventLoop::EventLoop() :
-		evLoop_(), prepareWatcher_(evLoop_), looping_(false), callingPendingFunctors_(
-				false), threadId_(CurrentThread::tid()), timerQueue_(
-				new TimerQueue(this)), wakeupFd_(createEventfd()), wakeupChannel_(
-				new Channel(this, wakeupFd_))
+		looping_(false),
+		quit_(false),
+		evLoop_(),
+		prepareWatcher_(evLoop_),
+		callingPendingFunctors_(false),
+		threadId_(CurrentThread::tid()),
+		timerQueue_(new TimerQueue(this)),
+		wakeupFd_(createEventfd()),
+		wakeupChannel_(new Channel(this, wakeupFd_))
 {
 	if (t_loopInThisThread)
 	{
@@ -102,6 +107,11 @@ void EventLoop::prepareCallBack()
 {
 	timerQueue_->clearExpiredTimer();
 	doPendingFunctors();
+	//execute doPendingFunctors() after last iteration;
+	if(quit_ == true)
+	{
+		evLoop_.break_loop();
+	}
 }
 
 void EventLoop::handleRead()
@@ -164,23 +174,35 @@ void EventLoop::runInLoop(const Functor& cb)
 	}
 }
 
-void EventLoop::quitInLoop()
-{
-	assertInLoopThread();
-	evLoop_.break_loop();
-}
+//void EventLoop::quitInLoop()
+//{
+//	assertInLoopThread();
+//	evLoop_.break_loop();
+//	//execute the pending functors after last iteration
+//	//which has processed all outstanding events
+//	doPendingFunctors();//Error: May casuse Channel release itself in its call back;
+//}
 
 //improve the thread safety;
+//void EventLoop::quit()
+//{
+//	if (isInLoopThread())
+//	{
+//		quitInLoop();
+//	}
+//	else
+//	{
+//		queueInLoop(boost::bind(&EventLoop::quitInLoop, this));
+//	}
+//}
+
 void EventLoop::quit()
 {
-	if (isInLoopThread())
-	{
-		quitInLoop();
-	}
-	else
-	{
-		queueInLoop(boost::bind(&EventLoop::quitInLoop, this));
-	}
+  quit_ = true;
+  if (!isInLoopThread())
+  {
+    wakeup();
+  }
 }
 
 void EventLoop::removeChannel(Channel* channel)
@@ -188,4 +210,9 @@ void EventLoop::removeChannel(Channel* channel)
 	assert(channel->ownerLoop() == this);
 //	assertInLoopThread();
 	channel->stop();
+}
+
+void EventLoop::cancel(TimerId timerId)
+{
+  return timerQueue_->cancel(timerId);
 }
