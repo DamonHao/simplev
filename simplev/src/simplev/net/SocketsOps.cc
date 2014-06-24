@@ -148,7 +148,7 @@ void sockets::fromHostPort(const char* ip, uint16_t port,
 	addr->sin_port = hostToNetwork16(port);
 	if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
 	{
-		Logger::perrorAndAbort("sockets::fromHostPort");
+		Logger::perror("sockets::fromHostPort");
 	}
 }
 
