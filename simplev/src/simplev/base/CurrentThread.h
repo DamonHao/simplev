@@ -25,6 +25,14 @@ inline int tid()
 	}
 	return t_cachedTid;
 }
+
+inline const char* tidString() // for logging
+{
+  return t_tidString;
+}
+
+bool isMainThread();
+
 }
 }
 
