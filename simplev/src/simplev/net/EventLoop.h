@@ -13,9 +13,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <ev++.h>
-#include <muduo/base/Mutex.h>
+//#include <muduo/base/Mutex.h>
+
 
 #include <simplev/base/CurrentThread.h>
+#include <simplev/base/Mutex.h>
 #include <simplev/net/Callbacks.h>
 #include <simplev/net/TimerId.h>
 
@@ -93,7 +95,8 @@ private:
 	boost::scoped_ptr<TimerQueue> timerQueue_;
 	int wakeupFd_;
 	boost::scoped_ptr<Channel> wakeupChannel_;
-	muduo::MutexLock mutex_; //FIXME: change to my own MutexLock;
+//	muduo::MutexLock mutex_; //FIXME: change to my own MutexLock;
+	MutexLock mutex_;
 	std::vector<Functor> pendingFunctors_; // @BuardedBy mutex_
 };
 

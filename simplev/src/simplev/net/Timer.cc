@@ -10,10 +10,10 @@
 #include <simplev/net/Timer.h>
 #include <simplev/net/EventLoop.h>
 
-
+using namespace simplev;
 using namespace simplev::net;
 
-muduo::AtomicInt64 Timer::s_numCreated_;
+AtomicInt64 Timer::s_numCreated_;
 
 Timer::Timer(EventLoop *loop, const TimerCallback& cb, double after,
 		double interval) :

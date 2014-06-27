@@ -11,7 +11,7 @@
 #include <boost/noncopyable.hpp>
 #include <ev++.h>
 
-#include <muduo/base/Atomic.h>
+#include <simplev/base/Atomic.h>
 
 #include <simplev/net/Callbacks.h>
 
@@ -39,7 +39,7 @@ private:
 	const int64_t sequence_;
 	TimerCallback callBack_;
 
-	static muduo::AtomicInt64 s_numCreated_;
+	static AtomicInt64 s_numCreated_;
 };
 
 

@@ -10,8 +10,8 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <muduo/base/Mutex.h>
 
+#include <simplev/base/Mutex.h>
 #include <simplev/net/TcpConnection.h>
 
 namespace simplev
@@ -63,7 +63,7 @@ private:
 	bool connect_; // atomic
 	// always in loop thread
 	int nextConnId_;
-	mutable muduo::MutexLock mutex_;
+	mutable MutexLock mutex_;
 	TcpConnectionPtr connection_; // @BuardedBy mutex_
 };
 

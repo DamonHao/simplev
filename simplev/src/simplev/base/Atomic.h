@@ -8,6 +8,8 @@
 #ifndef SIMPLEV_BASE_ATOMIC_H_
 #define SIMPLEV_BASE_ATOMIC_H_
 
+#include <stdint.h>
+
 namespace simplev
 {
 

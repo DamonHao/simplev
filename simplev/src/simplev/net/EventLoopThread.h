@@ -8,9 +8,13 @@
 #ifndef SIMPLEV_NET_EVENTLOOPTHREAD_H_
 #define SIMPLEV_NET_EVENTLOOPTHREAD_H_
 
-#include <muduo/base/Condition.h>
-#include <muduo/base/Mutex.h>
-#include <muduo/base/Thread.h>
+//#include <muduo/base/Condition.h>
+//#include <muduo/base/Mutex.h>
+//#include <muduo/base/Thread.h>
+
+#include <simplev/base/Condition.h>
+#include <simplev/base/Mutex.h>
+#include <simplev/base/Thread.h>
 
 
 namespace simplev
@@ -32,9 +36,9 @@ private:
 
  EventLoop* loop_;
  bool exiting_;
- muduo::Thread thread_;
- muduo::MutexLock mutex_;
- muduo::Condition cond_;
+ Thread thread_;
+ MutexLock mutex_;
+ Condition cond_;
 
 };
 

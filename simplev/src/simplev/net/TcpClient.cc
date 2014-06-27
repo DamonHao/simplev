@@ -57,7 +57,7 @@ TcpClient::~TcpClient()
 				reinterpret_cast<int>(get_pointer(connector_)));
 	TcpConnectionPtr conn;
   {
-    muduo::MutexLockGuard lock(mutex_);
+    MutexLockGuard lock(mutex_);
     conn = connection_;
   }
   if(conn)
@@ -93,7 +93,7 @@ void TcpClient::newConnection(int sockfd)
   conn->setWriteCompleteCallback(writeCompleteCallback_);
   conn->setCloseCallback(boost::bind(&TcpClient::removeConnection, this, _1)); // FIXME: unsafe
   {
-    muduo::MutexLockGuard lock(mutex_);
+    MutexLockGuard lock(mutex_);
     connection_ = conn;
   }
   conn->connectEstablished();
@@ -113,7 +113,7 @@ void TcpClient::disconnect()
   connect_ = false;
 
   {
-    muduo::MutexLockGuard lock(mutex_);
+    MutexLockGuard lock(mutex_);
     if (connection_)
     {
       connection_->shutdown();
@@ -132,7 +132,7 @@ void TcpClient::removeConnection(const TcpConnectionPtr& conn)
 	loop_->assertInLoopThread();
 	assert(loop_ == conn->getLoop());
   {
-    muduo::MutexLockGuard lock(mutex_);
+    MutexLockGuard lock(mutex_);
     assert(connection_ == conn);
     connection_.reset();
   }

@@ -140,7 +140,7 @@ void EventLoop::doPendingFunctors()
 	std::vector<Functor> functors;
 	callingPendingFunctors_ = true;
 	{
-		muduo::MutexLockGuard lock(mutex_);
+		MutexLockGuard lock(mutex_);
 		functors.swap(pendingFunctors_);
 	}
 	for (size_t i = 0; i < functors.size(); ++i)
@@ -153,7 +153,7 @@ void EventLoop::doPendingFunctors()
 void EventLoop::queueInLoop(const Functor& cb)
 {
 	{
-		muduo::MutexLockGuard lock(mutex_);
+		MutexLockGuard lock(mutex_);
 		pendingFunctors_.push_back(cb);
 	}
 	if (!isInLoopThread() || callingPendingFunctors_)

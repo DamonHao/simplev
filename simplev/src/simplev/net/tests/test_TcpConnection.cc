@@ -9,7 +9,6 @@
 
 #include <simplev/net/EventLoop.h>
 #include <simplev/net/InetAddress.h>
-//#include <simplev/net/TcpConnection.h>
 #include <simplev/net/TcpServer.h>
 
 using namespace simplev;

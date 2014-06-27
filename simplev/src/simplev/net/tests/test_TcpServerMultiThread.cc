@@ -5,10 +5,12 @@
  *      Author: damonhao
  */
 
-#include "simplev/net/TcpServer.h"
-#include "simplev/net/EventLoop.h"
-#include "simplev/net/InetAddress.h"
 #include <stdio.h>
+
+#include <simplev/net/TcpServer.h>
+#include <simplev/net/EventLoop.h>
+#include <simplev/net/InetAddress.h>
+
 
 using namespace simplev;
 using namespace simplev::net;
@@ -18,14 +20,14 @@ void onConnection(const TcpConnectionPtr& conn)
   if (conn->connected())
   {
     printf("onConnection(): tid=%d new connection [%s] from %s\n",
-           muduo::CurrentThread::tid(),
+           simplev::CurrentThread::tid(),
            conn->name().c_str(),
            conn->peerAddress().toIpPort().c_str());
   }
   else
   {
     printf("onConnection(): tid=%d connection [%s] is down\n",
-           muduo::CurrentThread::tid(),
+           simplev::CurrentThread::tid(),
            conn->name().c_str());
   }
 }
@@ -35,7 +37,7 @@ void onMessage(const TcpConnectionPtr& conn,
                Timestamp receiveTime)
 {
   printf("onMessage(): tid=%d received %zd bytes from connection [%s] at %s\n",
-         muduo::CurrentThread::tid(),
+         simplev::CurrentThread::tid(),
          buf->readableBytes(),
          conn->name().c_str(),
          receiveTime.toFormattedString().c_str());

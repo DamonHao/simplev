@@ -6,7 +6,7 @@
  */
 #include <stdio.h>
 
-#include <muduo/base/Thread.h>
+#include <simplev/base/Thread.h>
 
 #include "simplev/net/EventLoop.h"
 
@@ -29,7 +29,7 @@ int main()
 {
 	EventLoop loop;
 	g_loop = &loop;
-	muduo::Thread t(threadFunc);
+	simplev::Thread t(threadFunc);
 	t.start();
 	loop.loop();
 	return 0;
