@@ -16,8 +16,8 @@ std::string Timestamp::toFormattedString() const
 
   char buf[32] = {0};
   time_t seconds = static_cast<time_t>(static_cast<int>(secondsSinceEpoch_));
-
-  int microseconds = static_cast<int>((secondsSinceEpoch_ - static_cast<int>(secondsSinceEpoch_)) * 1000000);
+  int microseconds = static_cast<int>((secondsSinceEpoch_ - seconds) * 1000000);
+//  int microseconds = static_cast<int>((secondsSinceEpoch_ - static_cast<int>(secondsSinceEpoch_)) * 1000000);
   struct tm tm_time;
   gmtime_r(&seconds, &tm_time);
 
@@ -29,5 +29,13 @@ std::string Timestamp::toFormattedString() const
 
 }
 
+Timestamp Timestamp::now()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	double seconds = tv.tv_sec;
+	seconds += tv.tv_usec/1000000.0;
+	return Timestamp(seconds);
+}
 
 

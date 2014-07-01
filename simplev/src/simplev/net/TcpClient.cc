@@ -40,21 +40,19 @@ void removeConnector(const ConnectorPtr& connector)
 }
 
 TcpClient::TcpClient(EventLoop* loop, const InetAddress& serverAddr)
-	:loop_(checkNotNULL(loop)),
+	:loop_(CHECK_NOTNULL(loop)),
 	 connector_(new Connector(loop, serverAddr)),
 	 retry_(false),
 	 connect_(true),
 	 nextConnId_(1)
 {
 	connector_->setNewConnectionCallback(boost::bind(&TcpClient::newConnection, this, _1));
-	printf("TcpClient::TcpClient[%d]-connector[%d]", reinterpret_cast<int>(this),
-			reinterpret_cast<int>(get_pointer(connector_)));
+	LOG_INFO << "TcpClient::TcpClient[" << this << "] - connector " << get_pointer(connector_);
 }
 
 TcpClient::~TcpClient()
 {
-	printf("TcpClient::~TcpClient[%d]-connector[%d]", reinterpret_cast<int>(this),
-				reinterpret_cast<int>(get_pointer(connector_)));
+  LOG_INFO << "TcpClient::~TcpClient[" << this << "] - connector " << get_pointer(connector_);
 	TcpConnectionPtr conn;
   {
     MutexLockGuard lock(mutex_);
@@ -102,8 +100,8 @@ void TcpClient::newConnection(int sockfd)
 void TcpClient::connect()
 {
   // FIXME: check state
-  printf("TcpClient::connect[%d]-connecting to %s", reinterpret_cast<int>(this),
-  		connector_->serverAddress().toIpPort().c_str());
+  LOG_INFO << "TcpClient::connect[" << this << "] - connecting to "
+  		<< connector_->serverAddress().toIpPort();
   connect_ = true;
   connector_->start();
 }
@@ -139,8 +137,8 @@ void TcpClient::removeConnection(const TcpConnectionPtr& conn)
   loop_->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
   if(connect_ && retry_)
   {
-  	printf("TcpClient::connect[%d]-Reconnecting to %s", reinterpret_cast<int>(this),
-  	  		connector_->serverAddress().toIpPort().c_str());
+  	LOG_INFO << "TcpClient::connect[" << this << "] - Reconnecting to "
+  	             << connector_->serverAddress().toIpPort();
   	connector_->restart();
   }
 }

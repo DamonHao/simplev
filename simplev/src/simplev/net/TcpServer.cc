@@ -26,7 +26,7 @@ using namespace simplev::base;
 using namespace simplev::net;
 
 TcpServer::TcpServer(EventLoop *loop, const InetAddress& listenAddr) :
-	loop_(checkNotNULL(loop)),
+	loop_(CHECK_NOTNULL(loop)),
 	name_(listenAddr.toIpPort()),
 	acceptor_(new Acceptor(loop, listenAddr)),
 	threadPool_(new EventLoopThreadPool(loop)),
@@ -64,7 +64,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	pfds[0].events = POLLOUT;
 	if(::poll(pfds, 1, 0) < 0)
 	{
-		Logger::perror("TcpServer::newConnection - invalid sockfd");
+		LOG_SYSERR << "TcpServer::newConnection - invalid sockfd";
 		sockets::close(sockfd);
 		return;
 	}
@@ -72,9 +72,9 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	snprintf(buf, sizeof buf, "#%d", nextConnId_);
 	++nextConnId_;
 	std::string connName = name_ + buf;
-	//Logger
-	printf("TcpServer::newConnection[%s] from new connection %s\n", name_.c_str(),
-			connName.c_str());
+	LOG_INFO << "TcpServer::newConnection [" << name_
+	         << "] - new connection [" << connName
+	         << "] from " << peerAddr.toIpPort();
 	InetAddress localAddr(sockets::getLocalAddr(sockfd));
 	EventLoop* ioLoop = threadPool_->getNextLoop();
 	TcpConnectionPtr conn(
@@ -104,7 +104,8 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn)
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
 	loop_->assertInLoopThread();
-	printf("TcpServer::removeConnection[%s] connection: %s\n", name_.c_str(), conn->name().c_str());
+	LOG_INFO << "TcpServer::removeConnectionInLoop [" << name_
+	         << "] - connection " << conn->name();
 	size_t n = connections_.erase(conn->name());
 	assert(n == 1);
 	EventLoop* ioLoop = conn->getLoop();

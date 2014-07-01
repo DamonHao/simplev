@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include <simplev/net/EventLoop.h>
+#include <simplev/base/Logging.h>
 
 using namespace simplev::net;
 
@@ -19,13 +20,13 @@ Channel::Channel(EventLoop* loop, int fd) :
 {
 	ioWatcher_.set<Channel, &Channel::handleEvent>(this);
 	ioWatcher_.start(fd_, ev::NONE);
-	printf("Channel: %d\n", reinterpret_cast<int>(this));
+	LOG_TRACE <<"Channel ctor:" << this;
 }
 
 Channel::~Channel()
 {
 	assert(!eventHandling_);
-	printf("~Channel: %d\n", reinterpret_cast<int>(this));
+	LOG_TRACE <<"Channel dtor:" << this;
 }
 
 void Channel::handleEvent(ev::io &io_watcher, int revents)

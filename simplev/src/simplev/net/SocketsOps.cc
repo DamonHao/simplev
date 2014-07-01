@@ -45,7 +45,7 @@ int sockets::createNonblockingOrDie()
 	IPPROTO_TCP);
 	if (sockfd < 0)
 	{
-		Logger::perrorAndAbort("sockets::createNonblockingOrDie");
+		LOG_SYSFATAL << "sockets::createNonblockingOrDie";
 	}
 	return sockfd;
 }
@@ -57,7 +57,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr_in& addr)
 			static_cast<socklen_t>(sizeof addr));
 	if (ret < 0)
 	{
-		Logger::perrorAndAbort("sockets::bindOrDie");
+		LOG_SYSFATAL << "sockets::bindOrDie";
 	}
 }
 
@@ -66,7 +66,7 @@ void sockets::listenOrDie(int sockfd)
 	int ret = ::listen(sockfd, SOMAXCONN);
 	if (ret < 0)
 	{
-		Logger::perrorAndAbort("sockets::listenOrDie");
+		 LOG_SYSFATAL << "sockets::listenOrDie";
 	}
 }
 
@@ -79,7 +79,7 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
 	if (connfd < 0)
 	{
 		int savedErrno = errno;
-		Logger::perror("Socket::accept");
+		LOG_SYSERR << "Socket::accept";
 		switch (savedErrno)
 		{
 			case EAGAIN:
@@ -100,10 +100,10 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
 			case ENOTSOCK:
 			case EOPNOTSUPP:
 				// unexpected errors
-				Logger::perrorAndAbort("unexpected error of ::accept ");
+				LOG_FATAL << "unexpected error of ::accept " << savedErrno;
 				break;
 			default:
-				Logger::perrorAndAbort("unknown error of ::accept ");
+				LOG_FATAL << "unknown error of ::accept " << savedErrno;
 				break;
 		}
 	}
@@ -114,7 +114,7 @@ void sockets::shutdownWrite(int sockfd)
 {
 	if (::shutdown(sockfd, SHUT_WR) < 0)
 	{
-		Logger::perrorAndAbort("sockets::shutdownWrite");
+		LOG_SYSERR << "sockets::shutdownWrite";
 	}
 }
 
@@ -137,7 +137,7 @@ void sockets::close(int fd)
 {
 	if (::close(fd) < 0)
 	{
-		Logger::perror("sockets::close");
+		LOG_SYSERR << "sockets::close";
 	}
 }
 
@@ -148,7 +148,7 @@ void sockets::fromHostPort(const char* ip, uint16_t port,
 	addr->sin_port = hostToNetwork16(port);
 	if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
 	{
-		Logger::perror("sockets::fromHostPort");
+		LOG_SYSERR << "sockets::fromHostPort";
 	}
 }
 
@@ -171,7 +171,7 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd)
 			static_cast<struct sockaddr*>(static_cast<void*>(&localaddr)), &addrlen)
 			< 0)
 	{
-		Logger::perrorAndAbort("sockets::getLocalAddr");
+		LOG_SYSERR << "sockets::getLocalAddr";
 	}
 	return localaddr;
 }
@@ -205,7 +205,7 @@ struct sockaddr_in sockets::getPeerAddr(int sockfd)
 	socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
 	if (::getpeername(sockfd, sockaddr_cast(&peeraddr), &addrlen) < 0)
 	{
-		Logger::perror("sockets::getPeerAddr");
+		LOG_SYSERR << "sockets::getPeerAddr";
 	}
 	return peeraddr;
 }

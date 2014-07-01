@@ -29,7 +29,8 @@ int createEventfd()
 	int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
 	if (evtfd < 0)
 	{
-		Logger::perrorAndAbort("Failed in eventfd");
+		LOG_SYSERR << "Failed in eventfd";
+		abort();
 	}
 	return evtfd;
 }
@@ -40,7 +41,7 @@ class IgnoreSigPipe
   IgnoreSigPipe()
   {
     ::signal(SIGPIPE, SIG_IGN);
-    Logger::puts("Ignore SIGPIPE");
+    LOG_DEBUG <<"Ignore SIGPIPE";
   }
 };
 
@@ -61,7 +62,8 @@ EventLoop::EventLoop() :
 {
 	if (t_loopInThisThread)
 	{
-		Logger::printAndAbort("Another EventLoop exists in this thread");
+		LOG_FATAL << "Another EventLoop " << t_loopInThisThread
+		              << " exists in this thread " << threadId_;
 	}
 	else
 	{
@@ -78,8 +80,9 @@ EventLoop::~EventLoop()
 
 void EventLoop::abortNotInLoopThread()
 {
-	printf("EventLoop was created in thread: %d, and current thread: %d\n", threadId_, CurrentThread::tid());
-	Logger::printAndAbort("EventLoop::abortNotInLoopThread");
+  LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
+            << " was created in threadId_ = " << threadId_
+            << ", current thread id = " <<  CurrentThread::tid();
 }
 
 void EventLoop::loop()
@@ -120,8 +123,7 @@ void EventLoop::handleRead()
 	ssize_t n = sockets::read(wakeupFd_, &one, sizeof one);
 	if (n != sizeof one)
 	{
-		Logger::printAndAbort("EventLoop::handleRead() haven't reads 8 bytes");
-//    LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+		LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
 	}
 }
 
@@ -131,7 +133,7 @@ void EventLoop::wakeup()
 	ssize_t n = sockets::write(wakeupFd_, &one, sizeof one);
 	if (n != sizeof one)
 	{
-		Logger::printAndAbort("EventLoop::wakeup() haven't write 8 bytes");
+		LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
 	}
 }
 

@@ -62,7 +62,7 @@ void Connector::startInLoop()
 	}
 	else
 	{
-		Logger::puts("do not connect");
+		LOG_DEBUG << "do not connect";
 	}
 }
 
@@ -95,12 +95,12 @@ void Connector::connect()
 		case EBADF:
 		case EFAULT:
 		case ENOTSOCK:
-			Logger::perror("connect error in Connector::startInLoop ");
+			LOG_SYSERR << "connect error in Connector::startInLoop " << savedErrno;
 			sockets::close(sockfd);
 			break;
 
 		default:
-			Logger::perror("Unexpected error in Connector::startInLoop ");
+			LOG_SYSERR << "Unexpected error in Connector::startInLoop " << savedErrno;
 			sockets::close(sockfd);
 			// connectErrorCallback_();
 			break;
@@ -129,12 +129,13 @@ void Connector::handleWrite()
 		if (err)
 		{
 			printf("Connector::handleWrite - SO_ERROR = ");
-			Logger::puts(Logger::strerror_tl(err));
+			LOG_WARN << "Connector::handleWrite - SO_ERROR = "
+			               << err << " " << strerror_tl(err);
 			retry(sockfd);
 		}
 		else if (sockets::isSelfConnect(sockfd))
 		{
-			Logger::puts("Connector::handleWrite - Self connect");
+			LOG_WARN << "Connector::handleWrite - Self connect";
 			retry(sockfd);
 		}
 		else
@@ -164,7 +165,7 @@ void Connector::handleError()
   {
     int sockfd = removeAndResetChannel();
     int err = sockets::getSocketError(sockfd);
-    Logger::strerror_tl(err);
+    LOG_TRACE << "SO_ERROR = " << err << " " << strerror_tl(err);
     retry(sockfd);
   }
 }
@@ -198,7 +199,7 @@ void Connector::retry(int sockfd)
 	}
 	else
 	{
-		Logger::puts("do not connect");
+		LOG_DEBUG << "do not connect";
 	}
 }
 

@@ -58,7 +58,7 @@ void Socket::setReuseAddr(bool on)
 	 int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 	 if(ret < 0)
 	 {
-		 Logger::perror("Socket::setReuseAddr failed.");
+		 LOG_SYSERR << "Socket::setReuseAddr failed.";
 	 }
 }
 
@@ -70,12 +70,12 @@ void Socket::setReusePort(bool on)
                          &optval, static_cast<socklen_t>(sizeof optval));
   if (ret < 0)
   {
-    Logger::perror("SO_REUSEPORT failed.");
+    LOG_SYSERR << "SO_REUSEPORT failed.";
   }
 #else
   if (on)
   {
-  	Logger::puts("SO_REUSEPORT is not supported.") ;
+  	LOG_ERROR << "SO_REUSEPORT is not supported.";
   }
 #endif
 }
@@ -87,7 +87,7 @@ void Socket::setTcpNoDelay(bool on)
 							 &optval, static_cast<socklen_t>(sizeof optval));
 	if(ret < 0)
 	{
-		Logger::perror("Socket::setTcpNoDelay failed.");
+		LOG_SYSERR << "Socket::setTcpNoDelay failed.";
 	}
 }
 
@@ -98,6 +98,6 @@ void Socket::setKeepAlive(bool on)
                &optval, static_cast<socklen_t>(sizeof optval));
 	if(ret < 0)
 	{
-		Logger::perror("Socket::setKeepAlive failed.");
+		LOG_SYSERR << "Socket::setKeepAlive failed.";
 	}
 }

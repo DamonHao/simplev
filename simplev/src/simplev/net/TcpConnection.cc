@@ -40,7 +40,7 @@ using namespace simplev::net;
 		inputBuffer_(),
 		outputBuffer_()
  {
-	 printf("TcpConnection::ctor[%s], fd= %d\n", name_.c_str(), sockfd);
+	 LOG_DEBUG << "TcpConnection::ctor[" <<  name_ << "] at " << this<< " fd=" << sockfd;
 	 channel_->setReadCallback(
 	       boost::bind(&TcpConnection::handleRead, this, _1));
 	  channel_->setWriteCallback(
@@ -53,7 +53,7 @@ using namespace simplev::net;
 
  TcpConnection::~TcpConnection()
  {
-	 printf("TcpConnection::ctor[%s], fd= %d\n", name_.c_str(), socket_->fd());
+	 LOG_DEBUG << "TcpConnection::dtor[" <<  name_ << "] at " << this << " fd=" << channel_->fd();
  }
 
 void TcpConnection::connectEstablished()
@@ -80,7 +80,7 @@ void TcpConnection::handleRead(Timestamp receiveTime )
 	else
 	{
 		errno = savedErrno;
-		Logger::perror("TcpConnection::handleRead");
+		LOG_SYSERR << "TcpConnection::handleRead";
 		handleError();
 	}
 }
@@ -99,7 +99,8 @@ void TcpConnection::handleClose()
 void TcpConnection::handleError()
 {
   int err = sockets::getSocketError(channel_->fd());
-  Logger::strerror_tl(err); // thread local
+  LOG_ERROR << "TcpConnection::handleError [" << name_
+             << "] - SO_ERROR = " << err << " " << strerror_tl(err); // strerror_tl() is thread local;
 }
 
 void TcpConnection::handleWrite()
@@ -126,12 +127,12 @@ void TcpConnection::handleWrite()
 			}
 			else
 			{
-				Logger::puts("TcpConnection::handleWrite: going to write more data");
+				LOG_DEBUG << "TcpConnection::handleWrite: going to write more data";
 			}
 		}
 		else
 		{
-			Logger::perror("TcpConnection::handleWrite");
+			LOG_SYSERR << "TcpConnection::handleWrite";
 		}
 	}
 	else
@@ -140,7 +141,7 @@ void TcpConnection::handleWrite()
 		//In Channel::handleEvent(), readCallback_ will read socket and return 0, which means
 		//connection is down. it will sotp the ioWatcher and disable all events. But it still in
 		//Channel::handleEvent(), so the writeCallback_ will be executed. Then it go into this case;
-		Logger::puts("Connection is down, no more writing");
+		LOG_TRACE << "Connection fd = " << channel_->fd() << " is down, no more writing";
 	}
 }
 
@@ -210,7 +211,7 @@ void TcpConnection::sendInLoop(const std::string& message)
 			numWrite = 0;
 			if(errno != EWOULDBLOCK)
 			{
-				Logger::perror("TcpConnection::sendInLoop");
+				LOG_SYSERR << "TcpConnection::sendInLoop";
         if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
         {
           faultError = true;
