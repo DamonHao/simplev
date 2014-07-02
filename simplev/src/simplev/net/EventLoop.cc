@@ -49,10 +49,10 @@ IgnoreSigPipe initObj;
 
 }
 
-EventLoop::EventLoop() :
+EventLoop::EventLoop(unsigned int flags) :
 		looping_(false),
 		quit_(false),
-		evLoop_(),
+		evLoop_(flags),
 		prepareWatcher_(evLoop_),
 		callingPendingFunctors_(false),
 		threadId_(CurrentThread::tid()),

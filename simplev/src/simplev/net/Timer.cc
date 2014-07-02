@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <simplev/base/Logging.h>
 #include <simplev/net/Timer.h>
 #include <simplev/net/EventLoop.h>
 
@@ -21,7 +22,7 @@ Timer::Timer(EventLoop *loop, const TimerCallback& cb, double after,
 		sequence_(s_numCreated_.incrementAndGet()),
 		callBack_(cb)
 {
-	printf("Timer: %d\n", reinterpret_cast<int>(this));
+	LOG_TRACE <<"Timer ctor:" << this;
 	timeWatcher_.set<Timer, &Timer::run>(this);
 	timeWatcher_.set(after, interval);
 //	timeWatcher_.start(after, interval); //FIXME: Timer in incomplete state??
@@ -39,5 +40,5 @@ void Timer::stop()
 
 Timer::~Timer()
 {
-	printf("~Timer %d\n", reinterpret_cast<int>(this));
+	LOG_TRACE <<"Timer dtor:" << this;
 }

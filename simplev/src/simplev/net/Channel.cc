@@ -15,8 +15,12 @@
 
 using namespace simplev::net;
 
-Channel::Channel(EventLoop* loop, int fd) :
-		loop_(loop), fd_(fd), ioWatcher_(loop->getEventLoopRef()), eventHandling_(false)
+Channel::Channel(EventLoop* loop, int fd)
+	:loop_(loop),
+	 fd_(fd),
+	 ioWatcher_(loop->getEventLoopRef()),
+	 eventHandling_(false),
+	 tied_(false)
 {
 	ioWatcher_.set<Channel, &Channel::handleEvent>(this);
 	ioWatcher_.start(fd_, ev::NONE);
@@ -29,7 +33,7 @@ Channel::~Channel()
 	LOG_TRACE <<"Channel dtor:" << this;
 }
 
-void Channel::handleEvent(ev::io &io_watcher, int revents)
+void Channel::handleEventWithGuard(ev::io &io_watcher, int revents)
 {
 	eventHandling_ = true;
 	if (revents & ev::ERROR)
@@ -43,7 +47,7 @@ void Channel::handleEvent(ev::io &io_watcher, int revents)
 	{
 		if (readCallback_)
 		{
-//			readCallback_();
+			//			readCallback_();
 			Timestamp now(loop_->getEventLoopRef().now());
 			readCallback_(now);
 		}
@@ -58,6 +62,23 @@ void Channel::handleEvent(ev::io &io_watcher, int revents)
 	eventHandling_ = false;
 }
 
+void Channel::handleEvent(ev::io &io_watcher, int revents)
+{
+  boost::shared_ptr<void> guard;
+  if (tied_)
+  {
+    guard = tie_.lock();
+    if (guard)
+    {
+      handleEventWithGuard(io_watcher, revents);
+    }
+  }
+  else
+  {
+  	handleEventWithGuard(io_watcher, revents);
+  }
+}
+
 void Channel::remove()
 {
 	assert(isNoneEvent());
@@ -68,5 +89,11 @@ void Channel::stop()
 {
 	loop_->assertInLoopThread();
 	ioWatcher_.stop();
+}
+
+void Channel::tie(const boost::shared_ptr<void>& obj)
+{
+  tie_ = obj;
+  tied_ = true;
 }
 

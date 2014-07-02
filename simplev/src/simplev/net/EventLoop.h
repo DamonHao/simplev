@@ -34,7 +34,8 @@ class EventLoop: boost::noncopyable
 public:
 	typedef boost::function<void()> Functor;
 
-	EventLoop();
+//	EventLoop();
+	EventLoop(unsigned int flags = EVFLAG_AUTO);
 	~EventLoop(); //make it out-line because boost::scoped_ptr<TimerQueue> timerQueue_;
 	void loop();
 	void abortNotInLoopThread();
@@ -88,14 +89,13 @@ private:
 	bool looping_; /* atomic */ //FIXME: why atomic?
 	bool quit_; /* atomic */
 //	ev::default_loop evLoop_;
-	ev::dynamic_loop evLoop_;
+	ev::dynamic_loop evLoop_; // change the argument flags to change the backend. like EVBACKEND_EPOLL.
 	ev::prepare prepareWatcher_;
 	bool callingPendingFunctors_; /* atomic */
 	const pid_t threadId_;
 	boost::scoped_ptr<TimerQueue> timerQueue_;
 	int wakeupFd_;
 	boost::scoped_ptr<Channel> wakeupChannel_;
-//	muduo::MutexLock mutex_; //FIXME: change to my own MutexLock;
 	MutexLock mutex_;
 	std::vector<Functor> pendingFunctors_; // @BuardedBy mutex_
 };

@@ -10,6 +10,8 @@
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <ev++.h>
 
 #include <simplev/base/Timestamp.h>
@@ -59,13 +61,22 @@ public:
 		errorCallback_ = cb;
 	}
 
+  // Tie this channel to the owner object managed by shared_ptr,
+  // prevent the owner object being destroyed in handleEvent.
+  void tie(const boost::shared_ptr<void>&);
+
+
 private:
 	void handleEvent(ev::io &io_watcher, int revents);
+	void handleEventWithGuard(ev::io &io_watcher, int revents);
 
 	EventLoop* loop_;
 	const int fd_;
 	ev::io ioWatcher_;
 	bool eventHandling_;
+
+  boost::weak_ptr<void> tie_;
+  bool tied_;
 
 	ReadEventCallback readCallback_;
 //	EventCallback readCallback_;
