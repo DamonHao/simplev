@@ -27,12 +27,12 @@ Connector::Connector(EventLoop* loop, const InetAddress& serverAddr) :
 		state_(kDisconnected),
 		retryDelayMs_(kInitRetryDelayMs)
 {
-	printf("Connector ctor[%d]", reinterpret_cast<int>(this));
+	printf("Connector ctor[%d]", reinterpret_cast<long>(this));
 }
 
 Connector::~Connector()
 {
-  printf("Connector dtor[%d]", reinterpret_cast<int>(this));
+  printf("Connector dtor[%d]", reinterpret_cast<long>(this));
   loop_->cancel(timerId_);
   assert(!channel_);
 }
