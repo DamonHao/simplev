@@ -34,7 +34,8 @@ void onConnection(const TcpConnectionPtr& conn)
 	}
 }
 
-void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime)
+void
+onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime)
 {
 	printf("onMessage(): received %zd bytes from connection [%s] at %s\n",
 			buf->readableBytes(), conn->name().c_str(),

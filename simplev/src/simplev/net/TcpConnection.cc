@@ -257,7 +257,7 @@ void TcpConnection::send(const std::string& message)
 		}
 		else
 		{
-			loop_->queueInLoop(boost::bind(&TcpConnection::sendInLoop, this, message));
+			loop_->queueInLoop(boost::bind(&TcpConnection::sendInLoop, shared_from_this(), std::string(message)));
 		}
 	}
 }

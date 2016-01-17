@@ -18,15 +18,16 @@
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TcpServer.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Acceptor.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/SocketsOps.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/tests/test_TcpConnection_send.cc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/tests/main.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/tests/test_Channel.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/tests/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/tests/test_Acceptor.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Buffer.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/SocketsOps.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoop.cc" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoop.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Connector.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Socket.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoopThread.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Buffer.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoopThreadPool.cc" isTestSource="false" />
@@ -35,18 +36,19 @@
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/InetAddress.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Timer.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/InetAddress.cc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoop.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Channel.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoopThread.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TcpClient.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TcpConnection.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/EventLoopThreadPool.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.cc" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Socket.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Channel.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TcpClient.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Acceptor.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Timer.cc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/InetAddress.cc" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/Socket.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/simplev/net/TcpServer.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
@@ -85,15 +87,16 @@
           <root url="file://$MODULE_DIR$/src/simplev/net/TcpServer.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Acceptor.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/SocketsOps.h" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/tests/test_TcpConnection_send.cc" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/tests/main.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/tests/test_Channel.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/tests/CMakeLists.txt" />
           <root url="file://$MODULE_DIR$/src/simplev/net/tests/test_Acceptor.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Buffer.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/SocketsOps.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/EventLoop.cc" />
-          <root url="file://$MODULE_DIR$/src/simplev/net/EventLoop.h" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Connector.h" />
-          <root url="file://$MODULE_DIR$/src/simplev/net/Socket.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/EventLoopThread.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Buffer.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/EventLoopThreadPool.cc" />
@@ -102,18 +105,19 @@
           <root url="file://$MODULE_DIR$/src/simplev/net/CMakeLists.txt" />
           <root url="file://$MODULE_DIR$/src/simplev/net/InetAddress.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Timer.h" />
-          <root url="file://$MODULE_DIR$/src/simplev/net/InetAddress.cc" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/EventLoop.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Channel.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/EventLoopThread.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/TcpClient.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/TcpConnection.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/EventLoopThreadPool.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.cc" />
-          <root url="file://$MODULE_DIR$/src/simplev/net/TimerQueue.h" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/Socket.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Channel.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/TcpClient.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Acceptor.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Timer.cc" />
+          <root url="file://$MODULE_DIR$/src/simplev/net/InetAddress.cc" />
           <root url="file://$MODULE_DIR$/src/simplev/net/Socket.h" />
           <root url="file://$MODULE_DIR$/src/simplev/net/TcpServer.h" />
         </excluded>

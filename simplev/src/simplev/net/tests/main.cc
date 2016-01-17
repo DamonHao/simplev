@@ -24,8 +24,10 @@ using namespace simplev::net;
 int main()
 {
   EventLoop loop1;
-  EventLoop loop2;
-  puts("haha");
+//  EventLoop loop2;
+	puts("haha");
+	loop1.loop();
+	puts("xixi");
 //  g_loop = &loop;
 //
 //  int timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);

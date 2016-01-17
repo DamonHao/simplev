@@ -11,6 +11,7 @@
 #include "simplev/net/SocketsOps.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 using namespace simplev::net;
 

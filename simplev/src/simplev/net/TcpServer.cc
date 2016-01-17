@@ -62,15 +62,18 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	struct pollfd pfds[1];
 	pfds[0].fd = sockfd;
 	pfds[0].events = POLLOUT;
+
 	if(::poll(pfds, 1, 0) < 0)
 	{
 		LOG_SYSERR << "TcpServer::newConnection - invalid sockfd";
 		sockets::close(sockfd);
 		return;
 	}
+
 	char buf[32];
 	snprintf(buf, sizeof buf, "#%d", nextConnId_);
 	++nextConnId_;
+
 	std::string connName = name_ + buf;
 	LOG_INFO << "TcpServer::newConnection [" << name_
 	         << "] - new connection [" << connName
@@ -83,22 +86,17 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 	conn->setConnectionCallback(connectionCallback_);
 	conn->setMessageCallback(messageCallback_);
 	conn->setWriteCompleteCallback(writeCompleteCallback_);
-  conn->setCloseCallback(boost::bind(&TcpServer::removeConnection, this, _1));
-//	conn->connectEstablished();
-  //note, TcpConnection::connectEstablished must called in ioLoop;
-  ioLoop->runInLoop(boost::bind(&TcpConnection::connectEstablished, conn));
+	// FIXME unsafe, but TcpServer live longer than TcpConnection
+    conn->setCloseCallback(boost::bind(&TcpServer::removeConnection, this, _1));
+	//	conn->connectEstablished();
+    //note, TcpConnection::connectEstablished must called in ioLoop;
+    ioLoop->runInLoop(boost::bind(&TcpConnection::connectEstablished, conn));
 }
 
 void TcpServer::removeConnection(const TcpConnectionPtr& conn)
 {
 	//FIXME: why unsafe;
 	loop_->runInLoop(boost::bind(&TcpServer::removeConnectionInLoop, this, conn));
-//	loop_->assertInLoopThread();
-//	printf("TcpServer::removeConnection[%s] connection: %s\n", name_.c_str(), conn->name().c_str());
-//	size_t n = connections_.erase(conn->name());
-//	assert(n == 1);
-//	//must use queueInLoop to realease the Channel's watcher
-//	loop_->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
 }
 
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)

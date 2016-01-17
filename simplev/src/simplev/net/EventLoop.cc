@@ -141,10 +141,12 @@ void EventLoop::doPendingFunctors()
 {
 	std::vector<Functor> functors;
 	callingPendingFunctors_ = true;
+
 	{
 		MutexLockGuard lock(mutex_);
 		functors.swap(pendingFunctors_);
 	}
+
 	for (size_t i = 0; i < functors.size(); ++i)
 	{
 		functors[i]();
@@ -158,6 +160,7 @@ void EventLoop::queueInLoop(const Functor& cb)
 		MutexLockGuard lock(mutex_);
 		pendingFunctors_.push_back(cb);
 	}
+
 	if (!isInLoopThread() || callingPendingFunctors_)
 	{
 		wakeup();

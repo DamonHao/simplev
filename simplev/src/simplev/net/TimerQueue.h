@@ -40,7 +40,7 @@ private:
 
 
 //	typedef std::set<ev::timer*> TimerList;
-	typedef std::set<Timer*> TimerList;
+//	typedef std::set<Timer*> TimerList;
 	typedef std::pair<Timer* , int64_t> ValidTimer;
 	typedef std::set<ValidTimer> ValidTimerSet;
 	EventLoop* loop_;

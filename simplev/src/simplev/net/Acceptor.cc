@@ -49,6 +49,7 @@ void Acceptor::handleRead()
 {
 	loop_->assertInLoopThread();
 	InetAddress peerAddr(0);
+	// TODO use poll to test if fd is valid
 	int connfd = acceptSocket_.accept(&peerAddr);
 	if(connfd >= 0)
 	{

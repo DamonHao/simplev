@@ -35,6 +35,7 @@ public:
 	{ newConnectionCallback_ = cb;}
 	bool listening() const {return listening_;}
 	void listen();
+
 private:
 	void handleRead();
 

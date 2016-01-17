@@ -1,8 +1,14 @@
-add_executable(channel_test test_Channel.cc)
-target_link_libraries(channel_test simplev_net)
+add_executable(test_net main.cc)
+target_link_libraries(test_net simplev_net)
 
-add_executable(acceptor_test test_Acceptor.cc)
-target_link_libraries(acceptor_test simplev_net)
+add_executable(test_channel test_Channel.cc)
+target_link_libraries(test_channel simplev_net)
+
+add_executable(test_acceptor test_Acceptor.cc)
+target_link_libraries(test_acceptor simplev_net)
+
+add_executable(test_tcp_send test_TcpConnection_send.cc)
+target_link_libraries(test_tcp_send simplev_net)
 
 #add_executable(echoserver_unittest EchoServer_unittest.cc)
 #target_link_libraries(echoserver_unittest simplev_net)
