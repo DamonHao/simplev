@@ -40,7 +40,7 @@ Connector::~Connector()
 void Connector::start()
 {
   connect_ = true;
-  loop_->runInLoop(boost::bind(&Connector::startInLoop, this)); // FIXME: unsafe
+  loop_->runInLoop(boost::bind(&Connector::startInLoop, shared_from_this()));
 }
 
 void Connector::restart()
@@ -112,8 +112,8 @@ void Connector::connecting(int sockfd)
 	setState(kConnecting);
 	assert(!channel_);
 	channel_.reset(new Channel(loop_, sockfd));
-	channel_->setWriteCallback(boost::bind(&Connector::handleWrite, this)); //FIXME: unsafe???
-	channel_->setErrorCallback(boost::bind(&Connector::handleError, this)); //FIXME: unsafe???
+	channel_->setWriteCallback(boost::bind(&Connector::handleWrite, shared_from_this()));
+	channel_->setErrorCallback(boost::bind(&Connector::handleError, shared_from_this()));
 
 	// channel_->tie(shared_from_this()); is not working,
 	// as channel_ is not managed by shared_ptr
@@ -176,7 +176,7 @@ int Connector::removeAndResetChannel()
 	channel_->remove();
 	int sockfd = channel_->fd();
 	// Can't reset channel_ here, because we are inside Channel::handleEvent
-	loop_->queueInLoop(boost::bind(&Connector::resetChannel, this)); // FIXME: unsafe
+	loop_->queueInLoop(boost::bind(&Connector::resetChannel, shared_from_this()));
 	return sockfd;
 }
 
@@ -206,8 +206,7 @@ void Connector::retry(int sockfd)
 void Connector::stop()
 {
   connect_ = false;
-  loop_->queueInLoop(boost::bind(&Connector::stopInLoop, this)); // FIXME: unsafe
-  // FIXME: cancel timer
+  loop_->queueInLoop(boost::bind(&Connector::stopInLoop, shared_from_this()));
   loop_->cancel(timerId_);
 }
 

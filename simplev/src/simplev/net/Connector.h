@@ -41,6 +41,7 @@ public:
   void stop();  // can be called in any thread
 
   const InetAddress& serverAddress() const { return serverAddr_; }
+
 private:
 	enum States { kDisconnected, kConnecting, kConnected };
 

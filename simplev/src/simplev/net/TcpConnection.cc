@@ -212,10 +212,10 @@ void TcpConnection::sendInLoop(const std::string& message)
 			if(errno != EWOULDBLOCK)
 			{
 				LOG_SYSERR << "TcpConnection::sendInLoop";
-        if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
-        {
-          faultError = true;
-        }
+		        if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
+		        {
+		          faultError = true;
+		        }
 			}
 		}
 	}
